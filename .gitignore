@@ -1,0 +1,29 @@
+# Stata files
+*.log
+*.smcl
+*.gph
+*.dta.bak
+
+# Temporary files
+*.tmp
+*~
+.DS_Store
+Thumbs.db
+
+# Output files (optional - uncomment if you don't want to track generated outputs)
+# *.png
+# *.pdf
+# *.csv
+# *.xlsx (except source data)
+
+# Stata temporary datasets
+temp_*.dta
+tmp_*.dta
+
+# Backup files
+*.bak
+*_backup.*
+
+# System files
+.Rhistory
+.RData
