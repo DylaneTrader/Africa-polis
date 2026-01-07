@@ -29,6 +29,7 @@ Ce dépôt contient un script Stata complet pour l'analyse des modèles d'urbani
 2. **Distribution par classe de taille** : Classification des agglomérations urbaines selon leur population (10K-500K, 500K-1M, 1M-3M, 3M-5M, 5M-10M, 10M+)
 3. **Analyse des dynamiques** : Taux de croissance et changements absolus de l'urbanisation
 4. **Disparités régionales** : Comparaison des écarts d'urbanisation entre et au sein des régions
+5. **Multi-analyse** : Capacité de traiter plusieurs fichiers de données simultanément et de générer des analyses comparatives
 
 ---
 
@@ -36,9 +37,13 @@ Ce dépôt contient un script Stata complet pour l'analyse des modèles d'urbani
 
 ```
 Africa-polis/
-├── README.md                         # Documentation du projet
-├── Stata_workbook.xlsx               # Données source (agglomérations africaines)
-└── africa_urbanization_analysis.do   # Script Stata principal
+├── README.md                                 # Documentation du projet
+├── Stata_workbook.xlsx                       # Données source (agglomérations africaines)
+├── Stata_workbook_1.xlsx                     # Deuxième fichier pour démonstration de multi-analyse
+                                              # (contient les mêmes données que Stata_workbook.xlsx
+                                              # mais avec un format d'en-tête différent)
+├── africa_urbanization_analysis.do           # Script Stata principal (fichier unique)
+└── africa_urbanization_multi_analysis.do     # Script Stata multi-analyse (plusieurs fichiers)
 ```
 
 ---
@@ -85,7 +90,7 @@ Le fichier Excel contient les données des agglomérations urbaines africaines a
 
 ## 🚀 Guide d'Utilisation
 
-### Exécution du Script
+### Exécution du Script Standard (Fichier Unique)
 
 1. **Ouvrir Stata** et définir le répertoire de travail :
    ```stata
@@ -102,9 +107,34 @@ Le fichier Excel contient les données des agglomérations urbaines africaines a
    - Les graphiques seront exportés en format PNG
    - Les données seront exportées en formats `.dta` et `.xlsx`
 
+### Exécution du Script Multi-Analyse (Plusieurs Fichiers)
+
+1. **Ouvrir Stata** et définir le répertoire de travail :
+   ```stata
+   cd "/chemin/vers/Africa-polis"
+   ```
+
+2. **Exécuter le script multi-analyse** :
+   ```stata
+   do "africa_urbanization_multi_analysis.do"
+   ```
+
+3. **Fonctionnalités de la multi-analyse** :
+   - Traite automatiquement plusieurs fichiers Excel (`Stata_workbook.xlsx`, `Stata_workbook_1.xlsx`)
+   - Génère des analyses séparées pour chaque fichier
+   - Crée un résumé comparatif entre les datasets
+   - Gère automatiquement les différences de format dans les fichiers Excel
+   - Produit des graphiques de comparaison
+
+4. **Personnalisation** :
+   Pour ajouter ou modifier les fichiers à analyser, modifiez la ligne suivante dans le script :
+   ```stata
+   local files "Stata_workbook.xlsx Stata_workbook_1.xlsx VotreFichier.xlsx"
+   ```
+
 ### Options de Configuration
 
-Vous pouvez modifier le schéma graphique dans le script :
+Vous pouvez modifier le schéma graphique dans les scripts :
 ```stata
 set scheme s2color  // Schéma par défaut
 // Alternatives : s1mono, economist, sj
@@ -181,11 +211,44 @@ set scheme s2color  // Schéma par défaut
 - Synthèse des indicateurs continentaux
 - Export des résultats finaux
 
+### Section 7 : Multi-Analyse (Script `africa_urbanization_multi_analysis.do`)
+
+**Fonctionnalités spécifiques à la multi-analyse :**
+
+1. **Traitement automatisé de plusieurs fichiers**
+   - Boucle sur une liste de fichiers Excel définie par l'utilisateur
+   - Détection automatique du format des en-têtes
+   - Gestion robuste des variations de nommage des variables
+
+2. **Analyses individuelles par fichier**
+   - Chaque fichier est traité indépendamment
+   - Génération d'analyses complètes pour chaque dataset
+   - Préfixation des fichiers de sortie avec le nom du dataset source
+
+3. **Synthèse comparative**
+   - Tableau récapitulatif combinant les métriques de tous les datasets
+   - Graphiques de comparaison des parts urbaines entre datasets
+   - Export Excel du résumé comparatif
+
+4. **Résultats par fichier**
+   - Préparation des données : `[filename]_prepared.dta`
+   - Analyses régionales : `[filename]_regional_urban_rural.dta`
+   - Analyses par pays : `[filename]_country_urban_rural.dta`
+   - Classes de taille : `[filename]_size_class_2050.dta`
+   - Graphiques individuels pour chaque dataset
+
+5. **Résultats comparatifs**
+   - `multi_analysis_combined_summary.xlsx` : Tableau de comparaison
+   - `multi_analysis_comparison_urban_share.png` : Graphique comparatif
+   - Journal détaillé : `africa_urbanization_multi_analysis.log`
+
 ---
 
 ## 📤 Fichiers de Sortie
 
 ### Fichiers de Données (.dta)
+
+#### Fichiers d'Analyse Standard
 
 | Fichier | Description |
 |---------|-------------|
@@ -200,13 +263,32 @@ set scheme s2color  // Schéma par défaut
 | `size_class_dynamics.dta` | Dynamiques des classes de taille |
 | `regional_class_dynamics.dta` | Dynamiques régionales par classe |
 
+#### Fichiers de Multi-Analyse
+
+| Fichier | Description |
+|---------|-------------|
+| `[filename]_prepared.dta` | Données préparées pour chaque dataset |
+| `[filename]_regional_urban_rural.dta` | Données régionales par dataset |
+| `[filename]_country_urban_rural.dta` | Données par pays pour chaque dataset |
+| `[filename]_size_class_2050.dta` | Classes de taille 2050 par dataset |
+| `multi_analysis_combined_summary.dta` | Synthèse comparative de tous les datasets |
+
 ### Fichiers Excel (.xlsx)
+
+#### Fichiers d'Analyse Standard
 
 | Fichier | Description |
 |---------|-------------|
 | `country_urban_rural.xlsx` | Parts urbaines/rurales par pays |
 | `country_size_class.xlsx` | Classes de taille par pays |
 | `continental_summary.xlsx` | Synthèse continentale |
+
+#### Fichiers de Multi-Analyse
+
+| Fichier | Description |
+|---------|-------------|
+| `[filename]_country_urban_rural.xlsx` | Parts urbaines/rurales par pays pour chaque dataset |
+| `multi_analysis_combined_summary.xlsx` | Synthèse comparative entre tous les datasets |
 
 ### Fichiers CSV
 
@@ -218,11 +300,14 @@ set scheme s2color  // Schéma par défaut
 
 | Fichier | Description |
 |---------|-------------|
-| `africa_urbanization_analysis.log` | Journal complet de l'exécution |
+| `africa_urbanization_analysis.log` | Journal complet de l'exécution (analyse standard) |
+| `africa_urbanization_multi_analysis.log` | Journal complet de l'exécution (multi-analyse) |
 
 ---
 
 ## 📊 Graphiques Générés
+
+### Graphiques d'Analyse Standard
 
 | Fichier | Description |
 |---------|-------------|
@@ -236,6 +321,15 @@ set scheme s2color  // Schéma par défaut
 | `top15_urbanizing.png` | 15 pays avec urbanisation la plus rapide |
 | `size_class_growth_abs.png` | Croissance absolue par classe |
 | `size_class_growth_pct.png` | Croissance relative par classe |
+
+### Graphiques de Multi-Analyse
+
+| Fichier | Description |
+|---------|-------------|
+| `[filename]_continent_urban_rural.png` | Parts urbaines/rurales continentales par dataset |
+| `[filename]_region_urban_share.png` | Parts urbaines par région pour chaque dataset |
+| `[filename]_size_class_2050.png` | Distribution des classes de taille par dataset |
+| `multi_analysis_comparison_urban_share.png` | Comparaison des parts urbaines entre tous les datasets |
 
 ---
 
@@ -296,6 +390,82 @@ Les agglomérations sont classées selon leur population :
 
 ---
 
+## 💡 Exemples d'Utilisation
+
+### Exemple 1 : Analyse Standard d'un Seul Fichier
+
+```stata
+* Ouvrir Stata et se positionner dans le répertoire
+cd "/chemin/vers/Africa-polis"
+
+* Exécuter l'analyse standard
+do "africa_urbanization_analysis.do"
+
+* Les résultats seront dans :
+* - africa_urbanization_analysis.log (journal)
+* - Divers fichiers .dta (données)
+* - Divers fichiers .png (graphiques)
+```
+
+### Exemple 2 : Multi-Analyse avec Fichiers par Défaut
+
+```stata
+* Ouvrir Stata et se positionner dans le répertoire
+cd "/chemin/vers/Africa-polis"
+
+* Exécuter la multi-analyse (traite Stata_workbook.xlsx et Stata_workbook_1.xlsx)
+do "africa_urbanization_multi_analysis.do"
+
+* Les résultats seront dans :
+* - africa_urbanization_multi_analysis.log (journal)
+* - [nom_fichier]_prepared.dta (données préparées par fichier)
+* - [nom_fichier]_*.png (graphiques par fichier)
+* - multi_analysis_combined_summary.xlsx (tableau comparatif)
+* - multi_analysis_comparison_urban_share.png (graphique comparatif)
+```
+
+### Exemple 3 : Multi-Analyse avec Fichiers Personnalisés
+
+Pour analyser vos propres fichiers Excel, modifiez le script `africa_urbanization_multi_analysis.do`.
+
+Ouvrez le fichier et cherchez la **section CONFIGURATION** au début du script :
+
+```stata
+/*------------------------------------------------------------------------------
+    CONFIGURATION SECTION - MODIFY THESE SETTINGS
+------------------------------------------------------------------------------*/
+
+* Define the list of input files to analyze
+* Add or modify this list to process different Excel files
+local files "Stata_workbook.xlsx Votre_fichier_1.xlsx Votre_fichier_2.xlsx"
+```
+
+Puis exécutez :
+```stata
+do "africa_urbanization_multi_analysis.do"
+```
+
+### Exemple 4 : Utilisation des Résultats
+
+```stata
+* Charger les résultats d'un fichier spécifique
+use "Stata_workbook_prepared.dta", clear
+describe
+
+* Voir les données régionales
+use "Stata_workbook_regional_urban_rural.dta", clear
+list
+
+* Charger le résumé comparatif
+use "multi_analysis_combined_summary.dta", clear
+list
+
+* Ou ouvrir dans Excel
+* Ouvrir multi_analysis_combined_summary.xlsx
+```
+
+---
+
 ## 📝 Notes Importantes
 
 1. **Noms de Variables** : Stata peut renommer automatiquement les variables avec espaces/caractères spéciaux. Le script gère plusieurs patterns possibles avec `capture`.
@@ -305,6 +475,10 @@ Les agglomérations sont classées selon leur population :
 3. **Régions** : Les régions sont celles définies par l'Union Africaine (AU_Regions).
 
 4. **Reproductibilité** : Le script nettoie l'environnement (`clear all`) et ferme les logs existants au démarrage.
+
+5. **Format des Fichiers Excel** : Le script de multi-analyse gère automatiquement différents formats d'en-têtes Excel (ligne 0, ligne 1, avec ou sans ligne vide).
+
+6. **Comparaison des Datasets** : Si les fichiers contiennent les mêmes données avec des formats différents, la comparaison montrera des valeurs identiques. Pour comparer différentes versions de données, assurez-vous d'utiliser des fichiers avec des données réellement différentes.
 
 ---
 

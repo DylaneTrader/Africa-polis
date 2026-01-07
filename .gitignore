@@ -1,0 +1,31 @@
+# Test and demo files
+test_multi_analysis.py
+demo_multi_analysis.py
+multi_analysis_demo_summary.csv
+
+# Analysis output files (can be regenerated)
+*.log
+*.dta
+*.png
+analysis_results.csv
+continental_summary.xlsx
+country_urban_rural.xlsx
+country_size_class.xlsx
+multi_analysis_combined_summary.xlsx
+multi_analysis_combined_summary.dta
+*_prepared.dta
+*_regional_urban_rural.dta
+*_country_urban_rural.dta
+*_size_class_2050.dta
+*_continent_urban_rural.png
+*_region_urban_share.png
+*_size_class_2050.png
+multi_analysis_comparison_urban_share.png
+
+# Python environment
+__pycache__/
+*.pyc
+.pytest_cache/
+venv/
+env/
+MULTI_ANALYSIS_SUMMARY.md
