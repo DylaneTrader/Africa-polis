@@ -39,7 +39,7 @@ Ce dépôt contient un script Stata complet pour l'analyse des modèles d'urbani
 Africa-polis/
 ├── README.md                                 # Documentation du projet
 ├── Stata_workbook.xlsx                       # Données source (agglomérations africaines)
-├── Stata_workbook_1.xlsx                     # Données source alternatives
+├── Stata_workbook_1.xlsx                     # Deuxième fichier de données (pour tests de multi-analyse)
 ├── africa_urbanization_analysis.do           # Script Stata principal (fichier unique)
 └── africa_urbanization_multi_analysis.do     # Script Stata multi-analyse (plusieurs fichiers)
 ```
@@ -424,10 +424,17 @@ do "africa_urbanization_multi_analysis.do"
 
 ### Exemple 3 : Multi-Analyse avec Fichiers Personnalisés
 
-Pour analyser vos propres fichiers Excel, modifiez le script `africa_urbanization_multi_analysis.do` :
+Pour analyser vos propres fichiers Excel, modifiez le script `africa_urbanization_multi_analysis.do`.
+
+Ouvrez le fichier et cherchez la **section CONFIGURATION** au début du script :
 
 ```stata
-* Ligne 41 du script - Modifiez la liste des fichiers
+/*------------------------------------------------------------------------------
+    CONFIGURATION SECTION - MODIFY THESE SETTINGS
+------------------------------------------------------------------------------*/
+
+* Define the list of input files to analyze
+* Add or modify this list to process different Excel files
 local files "Stata_workbook.xlsx Votre_fichier_1.xlsx Votre_fichier_2.xlsx"
 ```
 

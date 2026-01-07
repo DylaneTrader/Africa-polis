@@ -23,22 +23,27 @@ clear all
 set more off
 cap log close
 
+/*------------------------------------------------------------------------------
+    CONFIGURATION SECTION - MODIFY THESE SETTINGS
+------------------------------------------------------------------------------*/
+
 * Set working directory (modify as needed)
 * cd "path/to/your/working/directory"
+
+* Define the list of input files to analyze
+* Add or modify this list to process different Excel files
+* Example: local files "File1.xlsx File2.xlsx File3.xlsx"
+local files "Stata_workbook.xlsx Stata_workbook_1.xlsx"
+
+/*------------------------------------------------------------------------------
+    END OF CONFIGURATION SECTION
+------------------------------------------------------------------------------*/
 
 * Create log file
 log using "africa_urbanization_multi_analysis.log", replace
 
 * Set graph scheme
 set scheme s2color
-
-/*------------------------------------------------------------------------------
-    DEFINE FILE LIST FOR ANALYSIS
-------------------------------------------------------------------------------*/
-
-* Define the list of input files to analyze
-* Add or modify this list to process different files
-local files "Stata_workbook.xlsx Stata_workbook_1.xlsx"
 
 * Counter for file processing
 local file_counter = 1
@@ -94,24 +99,48 @@ foreach input_file of local files {
     else {
         * Variables might have generic names like A, B, C
         * Check if first data row contains headers
-        * Use proper string access for Stata
-        qui levelsof `first_var' in 1, local(test_val) clean
+        * Get first cell value safely
+        cap confirm string variable `first_var'
+        if _rc == 0 {
+            * It's a string variable
+            local test_val = `first_var'[1]
+        }
+        else {
+            * It's a numeric variable - convert to string to check
+            qui tostring `first_var', gen(_temp_str_check) force
+            local test_val = _temp_str_check[1]
+            drop _temp_str_check
+        }
+        
         if "`test_val'" == "Agglomeration_ID" {
             di "Found headers in first data row, fixing variable names..."
             * Manually set proper variable names from first row
             local col_num = 0
             foreach var of varlist _all {
                 local col_num = `col_num' + 1
-                * Get value from first observation
-                qui levelsof `var' in 1, local(newname) clean
-                * Skip if empty
+                * Get value from first observation safely
+                cap confirm string variable `var'
+                if _rc == 0 {
+                    * String variable
+                    local newname = `var'[1]
+                }
+                else {
+                    * Numeric variable - convert
+                    qui tostring `var', gen(_temp_`col_num') force
+                    local newname = _temp_`col_num'[1]
+                    drop _temp_`col_num'
+                }
+                
+                * Skip if empty or missing
                 if "`newname'" != "" & "`newname'" != "." {
-                    * Clean the variable name
+                    * Clean the variable name - remove/replace special characters
                     local newname = subinstr("`newname'", " ", "_", .)
                     local newname = subinstr("`newname'", "+", "plus", .)
                     local newname = subinstr("`newname'", "-", "_", .)
-                    * Only rename if newname is valid
-                    if "`newname'" != "" {
+                    local newname = subinstr("`newname'", "/", "_", .)
+                    local newname = subinstr("`newname'", ".", "_", .)
+                    * Only rename if newname is valid and different
+                    if "`newname'" != "" & "`newname'" != "`var'" {
                         cap rename `var' `newname'
                     }
                 }
