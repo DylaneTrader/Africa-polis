@@ -91,12 +91,22 @@ foreach input_file of local files {
     local varlist = r(varlist)
     local first_var : word 1 of `varlist'
     
-    * Check if first variable is unnamed (starts with A-Z for default Excel naming)
-    * or contains the actual header text
-    if "`first_var'" == "A" | "`first_var'" == "Agglomeration_ID" {
-        di "Variable names look correct: `first_var'"
+    * Check if headers were imported correctly
+    * Case 1: Default Excel column naming (A, B, C, etc.)
+    * Case 2: Proper header was imported (Agglomeration_ID)
+    if "`first_var'" == "A" {
+        di "Default Excel column names detected (A, B, C...), headers may be in data"
+        * Will check first data row below
+    }
+    else if "`first_var'" == "Agglomeration_ID" {
+        di "Headers imported correctly: `first_var'"
     }
     else {
+        di "Variable name: `first_var', checking if headers are in first data row..."
+    }
+    
+    * If not obviously correct, check if first data row contains headers
+    if "`first_var'" != "Agglomeration_ID" {
         * Variables might have generic names like A, B, C
         * Check if first data row contains headers
         * Get first cell value safely
@@ -210,7 +220,8 @@ foreach input_file of local files {
     cap rename CPopulation_2050_5Mto10M cp2050_5M_10M
     cap rename CPopulation_2050_10M cp2050_10M
     
-    * Alternative pattern: spaces become "to" with spaces
+    * Alternative patterns: handle variations like '10to500K' (with K suffix) 
+    * or '__10M' (double underscore for +10M)
     cap rename CPopulation_2000_10to500K cp2000_10_500
     cap rename CPopulation_2000_500to1M cp2000_500_1M
     cap rename CPopulation_2000_1Mto3M cp2000_1M_3M
