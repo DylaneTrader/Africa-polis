@@ -28,3 +28,4 @@ __pycache__/
 .pytest_cache/
 venv/
 env/
+MULTI_ANALYSIS_SUMMARY.md
