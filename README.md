@@ -310,7 +310,7 @@ Les agglomérations sont classées selon leur population :
 
 ## 👥 Contribution
 
-Les contributions sont les bienvenues ! Veuillez ouvrir une issue pour discuter des modifications proposées.
+Les contributions sont les bienvenues ! Veuillez consulter le fichier [CONTRIBUTING.md](CONTRIBUTING.md) pour plus de détails sur comment contribuer au projet.
 
 ---
 
