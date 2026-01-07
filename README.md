@@ -388,6 +388,75 @@ Les agglomérations sont classées selon leur population :
 
 ---
 
+## 💡 Exemples d'Utilisation
+
+### Exemple 1 : Analyse Standard d'un Seul Fichier
+
+```stata
+* Ouvrir Stata et se positionner dans le répertoire
+cd "/chemin/vers/Africa-polis"
+
+* Exécuter l'analyse standard
+do "africa_urbanization_analysis.do"
+
+* Les résultats seront dans :
+* - africa_urbanization_analysis.log (journal)
+* - Divers fichiers .dta (données)
+* - Divers fichiers .png (graphiques)
+```
+
+### Exemple 2 : Multi-Analyse avec Fichiers par Défaut
+
+```stata
+* Ouvrir Stata et se positionner dans le répertoire
+cd "/chemin/vers/Africa-polis"
+
+* Exécuter la multi-analyse (traite Stata_workbook.xlsx et Stata_workbook_1.xlsx)
+do "africa_urbanization_multi_analysis.do"
+
+* Les résultats seront dans :
+* - africa_urbanization_multi_analysis.log (journal)
+* - [nom_fichier]_prepared.dta (données préparées par fichier)
+* - [nom_fichier]_*.png (graphiques par fichier)
+* - multi_analysis_combined_summary.xlsx (tableau comparatif)
+* - multi_analysis_comparison_urban_share.png (graphique comparatif)
+```
+
+### Exemple 3 : Multi-Analyse avec Fichiers Personnalisés
+
+Pour analyser vos propres fichiers Excel, modifiez le script `africa_urbanization_multi_analysis.do` :
+
+```stata
+* Ligne 24 du script - Modifiez la liste des fichiers
+local files "Stata_workbook.xlsx Votre_fichier_1.xlsx Votre_fichier_2.xlsx"
+```
+
+Puis exécutez :
+```stata
+do "africa_urbanization_multi_analysis.do"
+```
+
+### Exemple 4 : Utilisation des Résultats
+
+```stata
+* Charger les résultats d'un fichier spécifique
+use "Stata_workbook_prepared.dta", clear
+describe
+
+* Voir les données régionales
+use "Stata_workbook_regional_urban_rural.dta", clear
+list
+
+* Charger le résumé comparatif
+use "multi_analysis_combined_summary.dta", clear
+list
+
+* Ou ouvrir dans Excel
+* Ouvrir multi_analysis_combined_summary.xlsx
+```
+
+---
+
 ## 📝 Notes Importantes
 
 1. **Noms de Variables** : Stata peut renommer automatiquement les variables avec espaces/caractères spéciaux. Le script gère plusieurs patterns possibles avec `capture`.
@@ -397,6 +466,10 @@ Les agglomérations sont classées selon leur population :
 3. **Régions** : Les régions sont celles définies par l'Union Africaine (AU_Regions).
 
 4. **Reproductibilité** : Le script nettoie l'environnement (`clear all`) et ferme les logs existants au démarrage.
+
+5. **Format des Fichiers Excel** : Le script de multi-analyse gère automatiquement différents formats d'en-têtes Excel (ligne 0, ligne 1, avec ou sans ligne vide).
+
+6. **Comparaison des Datasets** : Si les fichiers contiennent les mêmes données avec des formats différents, la comparaison montrera des valeurs identiques. Pour comparer différentes versions de données, assurez-vous d'utiliser des fichiers avec des données réellement différentes.
 
 ---
 

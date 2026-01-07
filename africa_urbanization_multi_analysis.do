@@ -71,21 +71,52 @@ foreach input_file of local files {
     di "-" * 60
     
     * Import data from Excel
-    * Note: Some files may have headers in the first data row
-    import excel using "`input_file'", clear
+    * Note: Some files may have headers in different rows or formats
+    * Always try importing with firstrow option
+    cap import excel using "`input_file'", firstrow clear
     
-    * Check if first row contains headers (check if first cell equals "Agglomeration_ID")
-    local first_cell = A[1]
+    if _rc != 0 {
+        di as error "Failed to import `input_file' with firstrow option"
+        di "Trying without firstrow..."
+        import excel using "`input_file'", clear
+    }
     
-    if "`first_cell'" == "Agglomeration_ID" {
-        * Headers are in first row, need to re-import with firstrow option
-        di "Detected headers in first data row, re-importing..."
-        import excel using "`input_file'", firstrow clear
+    * Check if we got proper column names
+    qui ds
+    local varlist = r(varlist)
+    local first_var : word 1 of `varlist'
+    
+    * Check if first variable is unnamed (starts with A-Z for default Excel naming)
+    * or contains the actual header text
+    if "`first_var'" == "A" | "`first_var'" == "Agglomeration_ID" {
+        di "Variable names look correct: `first_var'"
     }
     else {
-        * Headers were already imported correctly
-        di "Headers imported correctly"
+        * Variables might have generic names like A, B, C
+        * Check if first data row contains headers
+        local test_val = `first_var'[1]
+        if "`test_val'" == "Agglomeration_ID" {
+            di "Found headers in first data row, fixing variable names..."
+            * Manually set proper variable names from first row
+            local col_num = 0
+            foreach var of varlist _all {
+                local col_num = `col_num' + 1
+                local newname = `var'[1]
+                * Skip if empty
+                if "`newname'" != "" & "`newname'" != "." {
+                    * Clean the variable name
+                    local newname = subinstr("`newname'", " ", "_", .)
+                    local newname = subinstr("`newname'", "+", "plus", .)
+                    local newname = subinstr("`newname'", "-", "_", .)
+                    cap rename `var' `newname'
+                }
+            }
+            * Drop the header row
+            drop in 1
+        }
     }
+    
+    di "Data import completed"
     
     * Display basic information
     describe, short
