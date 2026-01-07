@@ -94,21 +94,26 @@ foreach input_file of local files {
     else {
         * Variables might have generic names like A, B, C
         * Check if first data row contains headers
-        local test_val = `first_var'[1]
+        * Use proper string access for Stata
+        qui levelsof `first_var' in 1, local(test_val) clean
         if "`test_val'" == "Agglomeration_ID" {
             di "Found headers in first data row, fixing variable names..."
             * Manually set proper variable names from first row
             local col_num = 0
             foreach var of varlist _all {
                 local col_num = `col_num' + 1
-                local newname = `var'[1]
+                * Get value from first observation
+                qui levelsof `var' in 1, local(newname) clean
                 * Skip if empty
                 if "`newname'" != "" & "`newname'" != "." {
                     * Clean the variable name
                     local newname = subinstr("`newname'", " ", "_", .)
                     local newname = subinstr("`newname'", "+", "plus", .)
                     local newname = subinstr("`newname'", "-", "_", .)
-                    cap rename `var' `newname'
+                    * Only rename if newname is valid
+                    if "`newname'" != "" {
+                        cap rename `var' `newname'
+                    }
                 }
             }
             * Drop the header row

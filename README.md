@@ -427,7 +427,7 @@ do "africa_urbanization_multi_analysis.do"
 Pour analyser vos propres fichiers Excel, modifiez le script `africa_urbanization_multi_analysis.do` :
 
 ```stata
-* Ligne 24 du script - Modifiez la liste des fichiers
+* Ligne 41 du script - Modifiez la liste des fichiers
 local files "Stata_workbook.xlsx Votre_fichier_1.xlsx Votre_fichier_2.xlsx"
 ```
 
