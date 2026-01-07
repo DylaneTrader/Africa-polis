@@ -39,7 +39,9 @@ Ce dépôt contient un script Stata complet pour l'analyse des modèles d'urbani
 Africa-polis/
 ├── README.md                                 # Documentation du projet
 ├── Stata_workbook.xlsx                       # Données source (agglomérations africaines)
-├── Stata_workbook_1.xlsx                     # Deuxième fichier de données (pour tests de multi-analyse)
+├── Stata_workbook_1.xlsx                     # Deuxième fichier pour démonstration de multi-analyse
+                                              # (contient les mêmes données que Stata_workbook.xlsx
+                                              # mais avec un format d'en-tête différent)
 ├── africa_urbanization_analysis.do           # Script Stata principal (fichier unique)
 └── africa_urbanization_multi_analysis.do     # Script Stata multi-analyse (plusieurs fichiers)
 ```

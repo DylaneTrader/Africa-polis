@@ -64,8 +64,17 @@ foreach input_file of local files {
     * Clear memory for new file
     clear
     
-    * Extract base filename for output naming
-    local base_name = substr("`input_file'", 1, strlen("`input_file'") - 5)
+    * Extract base filename for output naming (remove extension)
+    * Find the last dot in the filename
+    local dot_pos = strpos("`input_file'", ".")
+    if `dot_pos' > 0 {
+        * Extension found - remove it
+        local base_name = substr("`input_file'", 1, `dot_pos' - 1)
+    }
+    else {
+        * No extension - use full filename
+        local base_name = "`input_file'"
+    }
     
     /*--------------------------------------------------------------------------
         SECTION 1: DATA IMPORT AND PREPARATION
@@ -109,16 +118,20 @@ foreach input_file of local files {
     if "`first_var'" != "Agglomeration_ID" {
         * Variables might have generic names like A, B, C
         * Check if first data row contains headers
-        * Get first cell value safely
+        * Get first cell value safely using scalar
         cap confirm string variable `first_var'
         if _rc == 0 {
-            * It's a string variable
-            local test_val = `first_var'[1]
+            * It's a string variable - use scalar to get value
+            scalar _test_val = `first_var'[1]
+            local test_val = _test_val
+            scalar drop _test_val
         }
         else {
             * It's a numeric variable - convert to string to check
             qui tostring `first_var', gen(_temp_str_check) force
-            local test_val = _temp_str_check[1]
+            scalar _test_val = _temp_str_check[1]
+            local test_val = _test_val
+            scalar drop _test_val
             drop _temp_str_check
         }
         
@@ -128,16 +141,20 @@ foreach input_file of local files {
             local col_num = 0
             foreach var of varlist _all {
                 local col_num = `col_num' + 1
-                * Get value from first observation safely
+                * Get value from first observation safely using scalar
                 cap confirm string variable `var'
                 if _rc == 0 {
-                    * String variable
-                    local newname = `var'[1]
+                    * String variable - use scalar
+                    scalar _newname = `var'[1]
+                    local newname = _newname
+                    scalar drop _newname
                 }
                 else {
-                    * Numeric variable - convert
+                    * Numeric variable - convert then use scalar
                     qui tostring `var', gen(_temp_`col_num') force
-                    local newname = _temp_`col_num'[1]
+                    scalar _newname = _temp_`col_num'[1]
+                    local newname = _newname
+                    scalar drop _newname
                     drop _temp_`col_num'
                 }
                 
@@ -512,6 +529,7 @@ frame combined_summary {
             keep if indicator == "Urban Share (%)"
             
             if _N > 1 {
+                di _n "Creating comparison graph for multiple datasets..."
                 graph bar val_2000 val_2025 val_2050, over(dataset, label(angle(45))) ///
                     title("Comparison of Urban Share Across Datasets") ///
                     subtitle("Africa Continental Level") ///
@@ -520,6 +538,10 @@ frame combined_summary {
                     bar(1, color(navy*0.5)) bar(2, color(navy*0.75)) bar(3, color(navy)) ///
                     name(comparison_urban_share, replace)
                 graph export "multi_analysis_comparison_urban_share.png", replace width(1200) height(800)
+            }
+            else {
+                di _n "Note: Comparison graph not created (only one dataset was processed)"
+                di "To create comparison graphs, process multiple datasets by adding more files to the configuration"
             }
         restore
     }
